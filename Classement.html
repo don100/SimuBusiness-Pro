@@ -231,7 +231,7 @@
 </style></main></div>
 
 <script>
-  let isDesktopCollapsed = false;
+   let isDesktopCollapsed = false;
 
   function toggleSidebarDesktop() {
     const sidebar = document.getElementById('sidebar');
@@ -263,6 +263,23 @@
       topbar.classList.add('lg:left-72');
 
       toggleIcon.textContent = 'chevron_left';
+    }
+  }
+
+  function toggleSidebarMobile() {
+    const sidebar = document.getElementById('sidebar');
+    const overlay = document.getElementById('mobile-overlay');
+
+    if (sidebar.classList.contains('sidebar-mobile-hidden')) {
+      // Open
+      sidebar.classList.remove('sidebar-mobile-hidden');
+      overlay.classList.remove('hidden');
+      setTimeout(() => overlay.classList.remove('opacity-0'), 10);
+    } else {
+      // Close
+      sidebar.classList.add('sidebar-mobile-hidden');
+      overlay.classList.add('opacity-0');
+      setTimeout(() => overlay.classList.add('hidden'), 300);
     }
   }
 </script>
