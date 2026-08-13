@@ -66,6 +66,9 @@
 <a class="flex items-center gap-stack-md px-stack-md py-stack-sm rounded-xl text-on-surface-variant hover:bg-surface-container-high hover:text-on-surface transition-all overflow-hidden whitespace-nowrap" data-path="rh" href="#" title="Ressources Humaines">
 <span class="material-symbols-outlined shrink-0">groups</span><span class="sidebar-text">Ressources Humaines</span>
 </a>
+<a class="flex items-center gap-stack-md px-stack-md py-stack-sm rounded-xl text-on-surface-variant hover:bg-surface-container-high hover:text-on-surface transition-all overflow-hidden whitespace-nowrap" data-path="leaderboard" href="#" title="Classement">
+<span class="material-symbols-outlined shrink-0">leaderboard</span><span class="sidebar-text">Classement</span>
+</a>
 </nav>
 <div class="p-container-padding border-t border-outline-variant/30 mt-auto">
 <div class="flex items-center gap-stack-md sidebar-user">
@@ -101,7 +104,7 @@
 </div>
 </div>
 <div class="flex items-center gap-stack-md">
-<button class="flex items-center gap-2 text-on-surface-variant hover:text-on-surface hover:bg-surface-container-high px-4 py-2 rounded-full transition-colors border border-outline-variant/30" onclick="toggleMarketPanel()">
+<button class="flex items-center gap-2 text-on-surface-variant hover:text-on-surface hover:bg-surface-container-high px-4 py-2 rounded-full transition-colors border border-outline-variant/30" onclick="toggleMarketModal()">
 <span class="material-symbols-outlined text-[20px]">insights</span>
 <span class="font-bold text-body-md hidden sm:inline">Intelligence de Marché</span>
 </button>
@@ -139,6 +142,10 @@
 <span class="font-numeric-data text-on-surface" id="val-price">450 MAD</span>
 </div>
 <input class="w-full h-2 bg-surface-container-highest rounded-full appearance-none cursor-pointer focus:outline-none focus:ring-1 focus:ring-primary/50 accent-primary" max="1000" min="100" oninput="document.getElementById('val-price').textContent = this.value + ' MAD'" type="range" value="450"/>
+<div class="mt-2 p-3 bg-surface-container-high rounded-lg flex flex-col sm:flex-row gap-2 justify-between text-body-md text-on-surface-variant">
+<span>Coût Unitaire Estimé: <strong class="text-on-surface">310 MAD</strong></span>
+<span>Marge Unitaire Prévue: <strong class="text-primary">140 MAD</strong></span>
+</div>
 </div>
 <div class="flex flex-col gap-stack-sm">
 <div class="flex justify-between items-center">
@@ -149,7 +156,15 @@
 </div>
 <div class="flex flex-col gap-stack-sm">
 <div class="flex justify-between items-center">
+<div class="flex items-center gap-2">
 <label class="text-label-caps text-on-surface-variant">DÉPENSES R&amp;D (K MAD)</label>
+<div class="group relative flex items-center justify-center cursor-help">
+<span class="material-symbols-outlined text-tertiary-container text-[16px]">warning</span>
+<div class="absolute bottom-full mb-2 left-1/2 -translate-x-1/2 w-48 p-2 bg-surface-container-highest text-on-surface text-label-caps rounded shadow-lg opacity-0 group-hover:opacity-100 transition-opacity pointer-events-none z-10 text-center">
+Attention: Un faible investissement en R&amp;D affectera la qualité et la compétitivité future.
+</div>
+</div>
+</div>
 <span class="font-numeric-data text-on-surface" id="val-rd">85 K MAD</span>
 </div>
 <input class="w-full h-2 bg-surface-container-highest rounded-full appearance-none cursor-pointer focus:outline-none focus:ring-1 focus:ring-primary/50 accent-primary" max="300" min="0" oninput="document.getElementById('val-rd').textContent = this.value + ' K MAD'" type="range" value="85"/>
@@ -183,6 +198,9 @@
 <span class="font-numeric-data text-on-surface" id="val-cap">85%</span>
 </div>
 <input class="w-full h-2 bg-surface-container-highest rounded-full appearance-none cursor-pointer focus:outline-none focus:ring-1 focus:ring-secondary/50 accent-secondary" max="100" min="50" oninput="document.getElementById('val-cap').textContent = this.value + '%'" type="range" value="85"/>
+<div class="text-label-caps text-on-surface-variant mt-1">
+Production Prévue: <span class="text-secondary">8,500 unités</span> / Max: 10,000
+</div>
 </div>
 <div class="flex flex-col gap-stack-sm">
 <div class="flex justify-between items-center">
@@ -405,58 +423,42 @@
 </div>
 </div>
 </div>
-<!-- Market Intelligence Panel -->
-<div class="fixed inset-y-0 right-0 w-full md:w-[450px] bg-surface-container-low shadow-2xl z-50 transform translate-x-full transition-transform duration-300 border-l border-outline-variant/30 flex flex-col font-body-md" id="market-panel">
-<div class="p-container-padding border-b border-outline-variant/30 flex justify-between items-center bg-surface-container">
+<!-- Market Intelligence Modal -->
+<div class="fixed inset-0 bg-background/80 backdrop-blur-sm z-50 flex items-center justify-center p-4 hidden opacity-0 transition-opacity duration-300" id="market-modal-overlay" onclick="if(event.target === this) toggleMarketModal()">
+<div class="bg-surface-container rounded-2xl shadow-2xl w-full max-w-md flex flex-col font-body-md border border-outline-variant/30 transform scale-95 transition-transform duration-300" id="market-modal">
+<div class="p-container-padding border-b border-outline-variant/30 flex justify-between items-center bg-surface-container-low rounded-t-2xl">
 <h2 class="text-headline-sm font-headline-sm text-on-surface">Intelligence de Marché</h2>
-<button class="text-on-surface-variant hover:text-on-surface p-1 rounded-full hover:bg-surface-container-highest transition-colors" onclick="toggleMarketPanel()">
+<button class="text-on-surface-variant hover:text-on-surface p-1 rounded-full hover:bg-surface-container-highest transition-colors" onclick="toggleMarketModal()">
 <span class="material-symbols-outlined">close</span>
 </button>
 </div>
-<div class="p-container-padding flex-1 overflow-y-auto flex flex-col gap-stack-lg">
+<div class="p-container-padding flex flex-col gap-stack-lg">
+<div class="flex flex-col gap-2">
+<div class="flex justify-between items-center p-3 bg-surface-container-low rounded-xl">
+<span class="text-on-surface-variant">Prix Moyen du Marché</span>
+<span class="font-bold text-on-surface">430 MAD</span>
+</div>
+<div class="flex justify-between items-center p-3 bg-surface-container-low rounded-xl">
+<span class="text-on-surface-variant">Volume Marché Prévu</span>
+<span class="font-bold text-on-surface">120,000 unités</span>
+</div>
+</div>
 <div class="flex flex-col gap-stack-sm">
-<h3 class="text-label-caps text-on-surface-variant">TENDANCES DU MARCHÉ</h3>
-<p class="text-body-md text-on-surface-variant">La demande globale est en hausse de 5% ce trimestre. La sensibilité au prix est modérée, mais les attentes en matière de qualité et de présence marketing sont en forte croissance.</p>
+<h3 class="text-label-caps text-on-surface-variant">PRÉFÉRENCES CLIENTS</h3>
+<div class="flex flex-col gap-2">
+<div class="flex justify-between items-center text-body-md">
+<span class="text-on-surface">Sensibilité au prix</span>
+<span class="px-2 py-1 bg-error/10 text-error rounded text-label-caps">Élevée</span>
 </div>
-<div class="flex flex-col gap-stack-sm">
-<h3 class="text-label-caps text-on-surface-variant">COMPARAISON CONCURRENTS</h3>
-<div class="bg-surface-container rounded-xl overflow-hidden border border-outline-variant/20">
-<table class="w-full text-left text-body-md">
-<thead class="bg-surface-container-high text-on-surface border-b border-outline-variant/20 text-label-caps">
-<tr>
-<th class="px-4 py-3 font-medium">Acteur</th>
-<th class="px-4 py-3 font-medium text-right">Part de Marché</th>
-<th class="px-4 py-3 font-medium text-right">Prix Moyen</th>
-</tr>
-</thead>
-<tbody class="divide-y divide-outline-variant/20 text-on-surface-variant">
-<tr>
-<td class="px-4 py-3 text-on-surface font-bold">Vous (Équipe Alpha)</td>
-<td class="px-4 py-3 font-numeric-data text-right">14.5%</td>
-<td class="px-4 py-3 font-numeric-data text-right">450 MAD</td>
-</tr>
-<tr>
-<td class="px-4 py-3">Concurrent A</td>
-<td class="px-4 py-3 font-numeric-data text-right">18.2%</td>
-<td class="px-4 py-3 font-numeric-data text-right">420 MAD</td>
-</tr>
-<tr>
-<td class="px-4 py-3">Concurrent B</td>
-<td class="px-4 py-3 font-numeric-data text-right">12.0%</td>
-<td class="px-4 py-3 font-numeric-data text-right">480 MAD</td>
-</tr>
-<tr>
-<td class="px-4 py-3">Concurrent C</td>
-<td class="px-4 py-3 font-numeric-data text-right">9.5%</td>
-<td class="px-4 py-3 font-numeric-data text-right">410 MAD</td>
-</tr>
-</tbody>
-</table>
+<div class="flex justify-between items-center text-body-md">
+<span class="text-on-surface">Demande Qualité</span>
+<span class="px-2 py-1 bg-tertiary/10 text-tertiary rounded text-label-caps">Moyenne</span>
 </div>
 </div>
 </div>
 </div>
-<div class="fixed inset-0 bg-background/50 backdrop-blur-sm z-40 hidden opacity-0 transition-opacity duration-300" id="market-overlay" onclick="toggleMarketPanel()"></div>
+</div>
+</div>
 <script>
   let isDesktopCollapsed = false;
 
@@ -530,22 +532,23 @@
     }
   }
 
-  function toggleMarketPanel() {
-    const panel = document.getElementById('market-panel');
-    const overlay = document.getElementById('market-overlay');
+  function toggleMarketModal() {
+    const overlay = document.getElementById('market-modal-overlay');
+    const modal = document.getElementById('market-modal');
     
-    if (panel.classList.contains('translate-x-full')) {
+    if (overlay.classList.contains('hidden')) {
       // Open
       overlay.classList.remove('hidden');
-      // small delay for transition
       setTimeout(() => {
         overlay.classList.remove('opacity-0');
-        panel.classList.remove('translate-x-full');
+        modal.classList.remove('scale-95');
+        modal.classList.add('scale-100');
       }, 10);
     } else {
       // Close
       overlay.classList.add('opacity-0');
-      panel.classList.add('translate-x-full');
+      modal.classList.remove('scale-100');
+      modal.classList.add('scale-95');
       setTimeout(() => {
         overlay.classList.add('hidden');
       }, 300);
